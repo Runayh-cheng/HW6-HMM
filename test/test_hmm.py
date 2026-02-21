@@ -82,7 +82,7 @@ def test_full_weather():
     full_hmm = np.load('./data/full_weather_hmm.npz')
     full_input = np.load('./data/full_weather_sequences.npz')
 
-     hmm = HiddenMarkovModel(
+    hmm = HiddenMarkovModel(
         full_hmm["observation_states"],
         full_hmm["hidden_states"],
         full_hmm["prior_p"],
