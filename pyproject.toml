@@ -7,7 +7,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "hmm"
-authors = [{name = "Shu Zhang", email = "shu.zhang2@ucsf.edu"}]
+authors = [{name = "Runa Cheng", email = "yan.cheng@ucsf.edu"}]
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: MIT License"]

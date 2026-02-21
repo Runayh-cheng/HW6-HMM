@@ -22,14 +22,49 @@ def test_mini_weather():
     mini_hmm=np.load('./data/mini_weather_hmm.npz')
     mini_input=np.load('./data/mini_weather_sequences.npz')
 
+    #forward
+    model = HiddenMarkovModel(
+        #weather
+        mini_hmm['observation_states'],   
+        #hot/cold
+        mini_hmm['hidden_states'],       
+        mini_hmm['prior_p'],         
+        mini_hmm['transition_p'],
+        mini_hmm['emission_p']
+    )
+    obs_seq = mini_input['observation_state_sequence']   
+    expected_seq = list(mini_input['best_hidden_state_sequence'])
 
+    #probablity check range
+    assert 0.0 < forward_prob <= 1.0
+    #check is float
+    assert isinstance(forward_prob, float)
+    #check value; actual value calculated by ChatGPT
+    assert np.abs(forward_prob-0.03506441162109376) < 0.001
 
+    #viterbi
+    predicted_seq = model.viterbi(obs_seq)
+    #pred for every obj
+    assert len(predicted_seq) == len(obs_seq)
+    # the right states check 
+    valid_hidden = set(mini_hmm['hidden_states'])
+    for state in predicted_seq:
+        assert state in valid_hidden
+    #right seq actually
+    assert predicted_seq == expected_seq
 
+    #edge case 1: only one object so prob should be 1 since no split
+    one_obs = np.array(['sunny'])
+    one_fwd = model.forward(one_obs)
+    one_vit = model.viterbi(one_obs)
+    assert len(single_vit) == 1
+    #sunny should be hot
+    assert single_vit[0] == 'hot'
 
-
-    
-   
-    pass
+    #edge case 2: input is empty vec
+    emp = np.array([])
+    with pytest.raises(ValueError):
+        _ = hmm.forward(emp)
 
 
 
@@ -44,8 +79,44 @@ def test_full_weather():
     Assert that the state sequence returned is in the right order, has the right number of states, etc. 
 
     """
+    full_hmm = np.load('./data/full_weather_hmm.npz')
+    full_input = np.load('./data/full_weather_sequences.npz')
 
-    pass
+     hmm = HiddenMarkovModel(
+        full_hmm["observation_states"],
+        full_hmm["hidden_states"],
+        full_hmm["prior_p"],
+        full_hmm["transition_p"],
+        full_hmm["emission_p"]
+    )
+
+    full_input['observation_state_sequence']        
+    expected_seq = list(full_input['best_hidden_state_sequence'])
+    forward_prob = model.forward(obs_seq)
+    #prob calculated and right range 
+    assert forward_prob is not None
+    assert 0.0 < forward_prob <= 1.0
+    
+    #viterbi check 
+    predicted_seq = model.viterbi(obs_seq)
+    #same as before 
+    assert predicted_seq is not None
+    #right num of output 
+    assert len(predicted_seq) == len(obs_seq)
+    #right state
+    valid_hidden = set(full_hmm['hidden_states'])
+    for state in predicted_seq:
+        assert state in valid_hidden
+    #check against actual 
+    assert predicted_seq == expected_seq
+
+
+
+
+
+
+
+    
 
 
 
