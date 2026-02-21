@@ -35,6 +35,8 @@ def test_mini_weather():
     obs_seq = mini_input['observation_state_sequence']   
     expected_seq = list(mini_input['best_hidden_state_sequence'])
 
+    forward_prob = model.forward(obs_seq)
+
     #probablity check range
     assert 0.0 < forward_prob <= 1.0
     #check is float
@@ -57,14 +59,14 @@ def test_mini_weather():
     one_obs = np.array(['sunny'])
     one_fwd = model.forward(one_obs)
     one_vit = model.viterbi(one_obs)
-    assert len(single_vit) == 1
+    assert len(one_vit) == 1
     #sunny should be hot
-    assert single_vit[0] == 'hot'
+    assert one_vit[0] == 'hot'
 
     #edge case 2: input is empty vec
     emp = np.array([])
     with pytest.raises(ValueError):
-        _ = hmm.forward(emp)
+        _ = model.forward(emp)
 
 
 
@@ -82,7 +84,7 @@ def test_full_weather():
     full_hmm = np.load('./data/full_weather_hmm.npz')
     full_input = np.load('./data/full_weather_sequences.npz')
 
-    hmm = HiddenMarkovModel(
+    model = HiddenMarkovModel(
         full_hmm["observation_states"],
         full_hmm["hidden_states"],
         full_hmm["prior_p"],
@@ -90,7 +92,7 @@ def test_full_weather():
         full_hmm["emission_p"]
     )
 
-    full_input['observation_state_sequence']        
+    obs_seq = full_input['observation_state_sequence']        
     expected_seq = list(full_input['best_hidden_state_sequence'])
     forward_prob = model.forward(obs_seq)
     #prob calculated and right range 
@@ -109,24 +111,3 @@ def test_full_weather():
         assert state in valid_hidden
     #check against actual 
     assert predicted_seq == expected_seq
-
-
-
-
-
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
